@@ -74,13 +74,13 @@ int main(void)
     isFS = 0;
     GLfloat vertices[] = {
             // COORDS
-        -0.5f,   0.0f ,  0.5f,      0.0f, 0.5f,         
+        -0.5f,   0.0f ,  0.5f,      0.0f, 1.0f,         
         -0.5f,   0.0f , -0.5f,      0.0f, 0.0f,      
-         0.5f,   0.0f , -0.5f,      0.5f, 0.0f,
-         0.5f,   0.0f ,  0.5f,      0.5f, 0.5f,
+         0.5f,   0.0f , -0.5f,      1.0f, 0.0f,
+         0.5f,   0.0f ,  0.5f,      1.0f, 1.0f,
         -0.5f,   0.5f ,  0.5f,      0.0f, 1.0f,
-        -0.5f,   0.5f , -0.5f,      0.0f, 0.5f,
-         0.5f,   0.5f , -0.5f,      0.5f, 0.5f,
+        -0.5f,   0.5f , -0.5f,      0.0f, 0.0f,
+         0.5f,   0.5f , -0.5f,      1.0f, 1.0f,
          0.5f,   0.5f ,  0.5f,      0.0f, 1.0f
     };
 
@@ -101,7 +101,7 @@ int main(void)
 
     GLuint uniRef = glGetUniformLocation(shaderProgram.shaderId, "aspect");
 
-    Texture texture("texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture texture("stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     texture.texUnit(shaderProgram, "tex0", 0);
 
     float rotation = 0.0f;
@@ -117,7 +117,7 @@ int main(void)
         glfwGetFramebufferSize(window, &width, &height);
         float aspect = (float)width / (float)height;
         shaderProgram.Activate();
-
+        glUniform1f(uniRef, aspect);
         texture.bind();
         double crntTime = glfwGetTime();
         if(crntTime - prevTime  >= 1/60) {

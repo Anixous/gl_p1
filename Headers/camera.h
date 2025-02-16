@@ -1,5 +1,6 @@
 #ifndef CAMERA_CLASS_H
 #define CAMERA_CLASS_H
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
@@ -8,7 +9,6 @@
 #include "../include/glm/gtc/type_ptr.hpp"
 #include "../include/glm/gtx/rotate_vector.hpp"
 #include "../include/glm/gtx/vector_angle.hpp"
-
 #include "shader.h"
 
 class Camera
