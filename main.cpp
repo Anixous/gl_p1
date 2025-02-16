@@ -8,6 +8,7 @@
 #include "Headers/shader.h"
 #include "Headers/buffers.h"
 #include "Headers/texture.h"
+#include "Headers/camera.h"
 
 bool isFS;
 
@@ -72,6 +73,8 @@ int main(void)
     }
     glfwMakeContextCurrent(window);
     isFS = 0;
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
     GLfloat vertices[] = {
             // COORDS
         -0.5f,   0.0f ,  0.5f,      0.0f, 1.0f,         
@@ -109,6 +112,8 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
 
+    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+
     while (!glfwWindowShouldClose(window))
     { 
         glClearColor(0.031, 0.208, 0.4, 0);
@@ -119,27 +124,10 @@ int main(void)
         shaderProgram.Activate();
         glUniform1f(uniRef, aspect);
         texture.bind();
-        double crntTime = glfwGetTime();
-        if(crntTime - prevTime  >= 1/60) {
-            rotation += 0.2f;
-            prevTime = crntTime;
-        }
 
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 proj = glm::mat4(1.0f);
-
-        model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.1f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-        view = glm::translate(view, glm::vec3(0.0f, -0.3f, -2.0f));
-        proj = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 100.0f);
-
-        int modelLoc = glGetUniformLocation(shaderProgram.shaderId, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        int viewLoc = glGetUniformLocation(shaderProgram.shaderId, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        int projLoc = glGetUniformLocation(shaderProgram.shaderId, "proj");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+        camera.Inputs(window);
+		// Updates and exports the camera matrix to the Vertex Shader
+		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
 
         glUniform1f(uniRef, aspect);
         vao.Bind();
