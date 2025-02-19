@@ -12,6 +12,11 @@
 
 bool isFS;
 
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    std::cout << "Mouse Movement | X: " << xpos << " Y: " << ypos << std::endl;
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE){
@@ -49,18 +54,18 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
     GLuint indexes[] {
-        0, 1, 2,
-        0, 2, 3, 
-        4, 0, 1, 
-        4, 1, 5, 
-        5, 1, 2, 
-        5, 2, 6, 
-        6, 2, 3, 
-        6, 3, 7, 
-        7, 3, 0, 
-        7, 0, 4, 
-        4, 5, 6, 
-        4, 6, 7
+        0, 1, 2, 
+        0, 2, 3,
+        4, 5, 6,
+        4, 6, 7, 
+        8, 9, 10, 
+        8, 9, 11, 
+        12, 13, 14, 
+        12, 14, 15, 
+        16, 17, 18, 
+        16, 18, 19, 
+        20, 21, 22, 
+        20, 22, 23
     };
     GLFWwindow* window;
     if (!glfwInit())
@@ -78,15 +83,41 @@ int main(void)
     GLfloat vertices[] = {
             // COORDS
         -0.5f,   0.0f ,  0.5f,      0.0f, 1.0f,         
-        -0.5f,   0.0f , -0.5f,      0.0f, 0.0f,      
+        -0.5f,   0.0f , -0.5f,      0.0f, 0.0f,    // BOTTOM  
          0.5f,   0.0f , -0.5f,      1.0f, 0.0f,
          0.5f,   0.0f ,  0.5f,      1.0f, 1.0f,
+
         -0.5f,   0.5f ,  0.5f,      0.0f, 1.0f,
-        -0.5f,   0.5f , -0.5f,      0.0f, 0.0f,
+        -0.5f,   0.0f ,  0.5f,      0.0f, 0.0f,    //LEFT
+        -0.5f,   0.0f , -0.5f,      1.0f, 0.0f,
+        -0.5f,   0.5f , -0.5f,      1.0f, 1.0f,
+
+         0.5f,   0.5f ,  0.5f,      0.0f, 1.0f,
+         0.5f,   0.0f ,  0.5f,      0.0f, 0.0f,    //BACK
+        -0.5f,   0.0f ,  0.5f,      1.0f, 0.0f,
+        -0.5f,   0.5f ,  0.5f,      1.0f, 1.0f,
+
+        -0.5f,   0.5f , -0.5f,      0.0f, 1.0f,
+        -0.5f,   0.0f , -0.5f,      0.0f, 0.0f,     //RIGHT
+         0.5f,   0.0f ,  0.5f,      1.0f, 0.0f,
+         0.5f,   0.0f ,  0.5f,      1.0f, 1.0f,
+
+        -0.5f,   0.5f , -0.5f,      0.0f, 1.0f,
+        -0.5f,   0.0f , -0.5f,      0.0f, 0.0f,     //FRONT
+         0.5f,   0.0f , -0.5f,      1.0f, 0.0f,
+         0.5f,   0.5f , -0.5f,      1.0f, 1.0f,
+
+        -0.5f,   0.5f ,  0.5f,      0.0f, 1.0f,
+        -0.5f,   0.5f , -0.5f,      0.0f, 0.0f,     //TOP
          0.5f,   0.5f , -0.5f,      1.0f, 1.0f,
          0.5f,   0.5f ,  0.5f,      0.0f, 1.0f
     };
 
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    if (glfwRawMouseMotionSupported()) {
+        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    };
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     gladLoadGL();
@@ -107,9 +138,6 @@ int main(void)
     Texture texture("stone.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     texture.texUnit(shaderProgram, "tex0", 0);
 
-    float rotation = 0.0f;
-    double prevTime = glfwGetTime();
-
     glEnable(GL_DEPTH_TEST);
 
     Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -126,7 +154,6 @@ int main(void)
         texture.bind();
 
         camera.Inputs(window);
-		// Updates and exports the camera matrix to the Vertex Shader
 		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
 
         glUniform1f(uniRef, aspect);
